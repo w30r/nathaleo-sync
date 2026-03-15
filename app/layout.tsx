@@ -28,7 +28,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      {" "}
       {/* suppressHydrationWarning is key! */}
       <body className="font-sans">
         <ThemeProvider
