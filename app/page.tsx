@@ -121,7 +121,10 @@ export default function HomePage() {
     <main className="min-h-[100dvh] flex flex-col items-center justify-center p-6 bg-background">
       <div className="w-full max-w-sm space-y-12">
         <div className="text-center space-y-2 group">
-          <div className="flex items-center justify-center gap-2">
+          <h1 className="text-5xl font-black tracking-tighter text-primary italic mb-4">
+            FLIXTER
+          </h1>
+          <div className="flex items-center justify-center gap-2 mt-4">
             <h1 className="text-4xl font-black tracking-tighter">
               Hey, {user.name}!
             </h1>

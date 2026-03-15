@@ -53,7 +53,7 @@ export default function LobbyPage() {
   return (
     <main className="min-h-[100dvh] bg-background p-6 flex flex-col max-w-md mx-auto">
       {/* Header with Room Code */}
-      <div className="text-center space-y-2 mb-8">
+      <div className="text-center space-y-2 mb-8 ">
         <p className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">
           Room Code
         </p>
