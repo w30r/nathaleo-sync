@@ -1,8 +1,5 @@
 import { getRoomResults } from "@/app/actions/roomActions";
 import { notFound } from "next/navigation";
-import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import SummaryWrapped from "@/app/components/Wrapped";
 
 async function getMovieDetails(movieIds: string[]) {

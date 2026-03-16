@@ -8,7 +8,9 @@ export const SwipeEngine = ({ activeMovie, onAction }: any) => {
         {/* We will map through a stack here later */}
         <MovieCard
           movie={activeMovie}
-          onSwipe={(dir) => onAction(dir === "right" ? "like" : "dislike")}
+          onSwipe={(dir: string) =>
+            onAction(dir === "right" ? "like" : "dislike")
+          }
         />
       </div>
 

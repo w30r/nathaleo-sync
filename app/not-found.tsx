@@ -18,7 +18,7 @@ export default function NotFound() {
           Room is Empty
         </h2>
         <p className="max-w-70 text-sm text-muted-foreground leading-3 tracking-wide text-center">
-          The movie session you're looking for doesn't exist or the squad has
+          The movie session youre looking for doesnt exist or the squad has
           already disbanded.
         </p>
       </div>
