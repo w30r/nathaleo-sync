@@ -26,10 +26,21 @@ const GENRES = [
   { id: 35, name: "Comedy" },
   { id: 18, name: "Drama" },
   { id: 27, name: "Horror" },
-  { id: 10749, name: "Romance" },
   { id: 878, name: "Sci-Fi" },
-  { id: 53, name: "Thriller" },
   { id: 16, name: "Animation" },
+  { id: 12, name: "Adventure" },
+  { id: 80, name: "Crime" },
+  { id: 99, name: "Documentary" },
+  { id: 10751, name: "Family" },
+  { id: 14, name: "Fantasy" },
+  { id: 36, name: "History" },
+  { id: 10402, name: "Music" },
+  { id: 9648, name: "Mystery" },
+  { id: 10749, name: "Romance" },
+  { id: 10770, name: "TV Movie" },
+  { id: 53, name: "Thriller" },
+  { id: 10752, name: "War" },
+  { id: 37, name: "Western" },
 ];
 
 const YEAR_RANGES = [
@@ -60,6 +71,13 @@ export default function SetupPage() {
     );
   };
 
+  const handleSelectAllGenres = () => {
+    setSelectedGenres(GENRES.map((g) => g.id));
+  };
+  const handleDeselectAllGenres = () => {
+    setSelectedGenres([]);
+  };
+
   const handleCreateRoom = async () => {
     setLoading(true);
     try {
@@ -85,7 +103,7 @@ export default function SetupPage() {
   };
 
   return (
-    <main className="min-h-[100dvh] bg-background p-6 flex flex-col max-w-md mx-auto">
+    <main className="min-h-dvh bg-background p-6 flex flex-col max-w-md mx-auto select-none">
       <div className="flex items-center gap-4 mb-8">
         <Button
           variant="ghost"
@@ -105,16 +123,36 @@ export default function SetupPage() {
             <Film className="w-4 h-4" /> Pick Genres
           </label>
           <div className="flex flex-wrap gap-2">
-            {GENRES.map((g) => (
-              <Badge
-                key={g.id}
-                variant={selectedGenres.includes(g.id) ? "default" : "outline"}
-                className="cursor-pointer px-4 py-2 rounded-xl text-sm transition-all border-2"
-                onClick={() => toggleGenre(g.id)}
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant={
+                  selectedGenres.length === GENRES.length
+                    ? "default"
+                    : "secondary"
+                }
+                className="px-4 py-2 rounded-xl text-sm transition-all border-2"
+                onClick={handleSelectAllGenres}
               >
-                {g.name}
-              </Badge>
-            ))}
+                Select All
+              </Button>
+              <Button variant="destructive" onClick={handleDeselectAllGenres}>
+                Deselect All
+              </Button>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {GENRES.map((g) => (
+                <Badge
+                  key={g.id}
+                  variant={
+                    selectedGenres.includes(g.id) ? "default" : "outline"
+                  }
+                  className="cursor-pointer px-4 py-2 rounded-xl text-sm transition-all border-2"
+                  onClick={() => toggleGenre(g.id)}
+                >
+                  {g.name}
+                </Badge>
+              ))}
+            </div>
           </div>
         </div>
 

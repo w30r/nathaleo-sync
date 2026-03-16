@@ -2,11 +2,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { notFound, useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Users, Film, Timer, Share2, Play } from "lucide-react";
-import { getRoomData } from "@/app/actions/roomActions";
+import {
+  Loader2,
+  Users,
+  Film,
+  Timer,
+  Share2,
+  Play,
+  ArrowBigLeft,
+} from "lucide-react";
+import { getRoomData, startRoomAction } from "@/app/actions/roomActions";
+import Link from "next/link";
 
 export default function LobbyPage() {
   const { id } = useParams();
@@ -15,15 +24,36 @@ export default function LobbyPage() {
   const [room, setRoom] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [countdown, setCountdown] = useState(10);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
+  function handleStartSession() {
+    // start room action + shorten time
+    startRoomAction(id);
+    setCountdown(5);
+  }
+
+  useEffect(() => {
+    // Get the user from localStorage (or however you're tracking the session)
+    const storedUser = localStorage.getItem("flixter_user");
+    if (storedUser) {
+      const parsed = JSON.parse(storedUser);
+      setCurrentUserId(parsed.id);
+    }
+  }, []);
 
   useEffect(() => {
     const refreshLobby = async () => {
       const data = await getRoomData(id as string);
-      if (data) setRoom(data);
+      if (data) {
+        setRoom(data);
+        // 🔥 REDIRECT LOGIC: If the host started the room, move everyone!
+        if (data.status === "active") {
+          router.push(`/swipe/${id}`);
+        }
+      }
       setLoading(false);
-      setCountdown(10); // Reset visual timer after fetch
+      setCountdown(10);
     };
-
     refreshLobby();
 
     // 1. This interval handles the actual Data Fetch (every 10s)
@@ -48,10 +78,12 @@ export default function LobbyPage() {
     );
   }
 
-  if (!room) return <div className="p-10 text-center">Room not found!</div>;
+  if (!room) {
+    notFound();
+  }
 
   return (
-    <main className="min-h-[100dvh] bg-background p-6 flex flex-col max-w-md mx-auto">
+    <main className="min-h-dvh bg-background p-6 flex flex-col max-w-md mx-auto transition-all duration-200">
       {/* Header with Room Code */}
       <div className="text-center space-y-2 mb-8 ">
         <p className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">
@@ -78,13 +110,23 @@ export default function LobbyPage() {
             <h2 className="flex items-center gap-2 text-sm font-bold uppercase">
               <Users className="w-4 h-4" /> Squad
             </h2>
-            <span className="text-[10px] font-medium text-muted-foreground bg-card px-2 py-0.5 rounded-full flex items-center gap-1">
-              <span className="relative flex h-1.5 w-1.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-primary"></span>
+            {countdown > 2 ? (
+              <span className="text-[10px] font-medium text-muted-foreground bg-card px-2 py-0.5 rounded-full flex items-center gap-1">
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-primary"></span>
+                </span>
+                Refreshing in {countdown}s
               </span>
-              Refreshing in {countdown}s
-            </span>
+            ) : (
+              <span className="text-[10px] font-medium text-muted-foreground bg-card px-2 py-0.5 rounded-full flex items-center gap-1">
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-primary"></span>
+                </span>
+                Refreshing...
+              </span>
+            )}
           </div>
 
           <div className="flex flex-wrap gap-3">
@@ -134,10 +176,37 @@ export default function LobbyPage() {
       </div>
 
       {/* Start Button (Only for Host) */}
-      <div className="pt-8">
-        <Button className="w-full h-16 rounded-2xl text-xl font-black tracking-tight shadow-lg gap-2">
+      <div className="pt-8 flex flex-col gap-4">
+        {currentUserId === room.hostId ? (
+          <Button
+            className="w-full h-16 rounded-2xl text-xl font-black tracking-tight shadow-lg gap-2"
+            // onClick={() => startRoomAction(id)}
+            onClick={() => handleStartSession()}
+          >
+            <Play className="w-6 h-6 fill-current" /> START SESSION
+          </Button>
+        ) : (
+          <div className="bg-secondary/50 p-6 rounded-2xl text-center border-2 border-dashed">
+            <p className="text-sm font-bold text-muted-foreground animate-pulse">
+              Waiting for host to start...
+            </p>
+          </div>
+        )}
+        {/* <Button
+          className="w-full h-16 rounded-2xl text-xl font-black tracking-tight shadow-lg gap-2"
+          onClick={() => startRoomAction(id)}
+        >
           <Play className="w-6 h-6 fill-current" /> START SESSION
-        </Button>
+        </Button> */}
+        <Link href="/" className="w-full">
+          <Button
+            variant="outline"
+            className="w-full h-16 rounded-2xl text-xl font-black tracking-tight shadow-lg gap-2"
+          >
+            <ArrowBigLeft className="w-6 h-6 fill-current" />
+            GO BACK
+          </Button>
+        </Link>
       </div>
     </main>
   );

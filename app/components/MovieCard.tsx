@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState } from "react";
+import { Key, useState } from "react";
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Star, Undo2 } from "lucide-react";
@@ -16,6 +16,50 @@ export default function MovieCard({ movie, onSwipe, isTop, index }: any) {
     [-200, -150, 0, 150, 200],
     [0.5, 1, 1, 1, 0.5],
   );
+
+  const genreMap = new Map([
+    [28, "Action"],
+    [12, "Adventure"],
+    [16, "Animation"],
+    [35, "Comedy"],
+    [80, "Crime"],
+    [99, "Documentary"],
+    [18, "Drama"],
+    [10751, "Family"],
+    [14, "Fantasy"],
+    [36, "History"],
+    [27, "Horror"],
+    [10402, "Music"],
+    [9648, "Mystery"],
+    [10749, "Romance"],
+    [878, "Science Fiction"],
+    [10770, "TV Movie"],
+    [53, "Thriller"],
+    [10752, "War"],
+    [37, "Western"],
+  ]);
+
+  const genreColors = new Map([
+    [28, "bg-action"],
+    [12, "bg-adventure"],
+    [16, "bg-animation"],
+    [35, "bg-comedy"],
+    [80, "bg-crime"],
+    [99, "bg-documentary"],
+    [18, "bg-drama"],
+    [10751, "bg-family"],
+    [14, "bg-fantasy"],
+    [36, "bg-history"],
+    [27, "bg-horror"],
+    [10402, "bg-music"],
+    [9648, "bg-mystery"],
+    [10749, "bg-romance"],
+    [878, "bg-science-fiction"],
+    [10770, "bg-tv-movie"],
+    [53, "bg-thriller"],
+    [10752, "bg-war"],
+    [37, "bg-western"],
+  ]);
 
   const handleDragEnd = (_: any, info: any) => {
     if (isFlipped) {
@@ -58,7 +102,7 @@ export default function MovieCard({ movie, onSwipe, isTop, index }: any) {
       onDragEnd={handleDragEnd}
       onTap={handleTap}
       transition={{ type: "spring", stiffness: 250, damping: 25 }}
-      className="absolute inset-0 w-full h-full px-4 cursor-pointer touch-none [perspective:1000px]"
+      className="absolute inset-0 w-full h-full px-4 cursor-pointer touch-none [perspective:1000px] select-none"
     >
       {/* THE FLIPPER - This handles the 3D rotation */}
       <motion.div
@@ -83,14 +127,14 @@ export default function MovieCard({ movie, onSwipe, isTop, index }: any) {
             className="object-cover pointer-events-none"
             priority={isTop}
           />
-          <div className="absolute bottom-0 inset-x-0 h-1/2 bg-gradient-to-t from-black/95 via-black/40 to-transparent p-6 flex flex-col justify-end">
-            <h2 className="text-3xl font-black text-white leading-tight">
+          <div className="absolute bottom-0 inset-x-0 h-1/2 bg-linear-to-t from-card via-card/30 to-transparent p-6 flex flex-col justify-end">
+            <h2 className="text-3xl font-black text-white leading-5 mb-3">
               {movie.title}
             </h2>
-            <div className="flex items-center gap-2 mt-3">
-              <Badge className="bg-primary text-primary-background border-none">
-                <Star className="w-3 h-3 mr-1 fill-yellow-500" />
-                {movie.vote_average.toFixed(1)}
+            <div className="flex items-center gap-2 mt-1">
+              <Badge className="bg-primary text-primary-foreground border-none font-bold">
+                <Star className="w-3 h-3 mr-1 fill-secondary" />
+                {movie.vote_average.toFixed(2)}
               </Badge>
             </div>
           </div>
@@ -117,6 +161,17 @@ export default function MovieCard({ movie, onSwipe, isTop, index }: any) {
             <p className="text-lg text-muted-foreground font-medium leading-relaxed text-center balance line-clamp-[12]">
               {movie.overview || "No description available for this title."}
             </p>
+          </div>
+          <div className="flex items-center justify-center flex-wrap gap-y-1">
+            {movie.genre_ids.map((genreId: any) => (
+              <Badge
+                key={genreId}
+                variant="default"
+                className={`border-primary/20 font-bold text-black shadow-xs mr-1 ${genreColors.get(genreId)}`}
+              >
+                {genreMap.get(genreId) || "Unknown"}
+              </Badge>
+            ))}
           </div>
 
           <div className="flex justify-center gap-2 mt-6">

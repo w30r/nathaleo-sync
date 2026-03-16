@@ -2,6 +2,66 @@
 
 import clientPromise from "@/lib/mongodb";
 import { nanoid } from "nanoid";
+import { notFound } from "next/navigation";
+
+export async function getRoomResults(roomCode) {
+  try {
+    const client = await clientPromise;
+    const db = client.db("flixter-db");
+
+    const room = await db.collection("room").findOne({
+      roomCode: roomCode.toUpperCase(),
+    });
+
+    if (!room) return null;
+
+    // 1. Get all movie IDs liked by every participant
+    const participantLikes = room.participants.map((p) => p.likes || []);
+
+    // Find the intersection (movies everyone liked)
+    const matches = participantLikes.reduce((a, b) =>
+      a.filter((movieID) => b.includes(movieID)),
+    );
+
+    // 2. (Optional) Get movies liked by at least 2 people if no total match
+    const partialMatches = [...new Set(participantLikes.flat())].filter(
+      (movieID) => {
+        const count = participantLikes.filter((likes) =>
+          likes.includes(movieID),
+        ).length;
+        return count >= 2 && !matches.includes(movieID);
+      },
+    );
+
+    return {
+      matches,
+      partialMatches,
+      participants: room.participants,
+    };
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+}
+
+export async function finishSwipingAction(roomCode, userId) {
+  try {
+    const client = await clientPromise;
+    const db = client.db("flixter-db");
+
+    await db.collection("room").updateOne(
+      {
+        roomCode: roomCode.toUpperCase(),
+        "participants.id": userId,
+      },
+      { $set: { "participants.$.status": "finished" } },
+    );
+
+    return { success: true };
+  } catch (e) {
+    return { success: false };
+  }
+}
 
 export async function joinRoomAction(roomCode, userData) {
   try {
@@ -14,7 +74,9 @@ export async function joinRoomAction(roomCode, userData) {
     });
 
     if (!room) {
-      return { success: false, error: "Room not found or session ended" };
+      // router push to not-found page if room doesn't exist or isn't open
+      notFound();
+      return { success: false, error: "Room not found or not open" };
     }
 
     // Check if the user ID is already in the participants list
@@ -45,7 +107,7 @@ export async function joinRoomAction(roomCode, userData) {
     return { success: true };
   } catch (e) {
     console.error("Join Error:", e);
-    return { success: false, error: "External database error" };
+    return { success: false, error: e.message || "Failed to join room" };
   }
 }
 
@@ -101,5 +163,79 @@ export async function getRoomData(roomCode) {
   } catch (e) {
     console.error("Fetch Error:", e);
     return null;
+  }
+}
+
+export async function startRoomAction(roomCode) {
+  try {
+    const client = await clientPromise;
+    const db = client.db("flixter-db");
+
+    await db
+      .collection("room")
+      .updateOne(
+        { roomCode: roomCode.toUpperCase() },
+        { $set: { status: "active", startedAt: new Date() } },
+      );
+
+    return { success: true };
+  } catch (e) {
+    console.error("Start Room Error:", e);
+    return { success: false };
+  }
+}
+
+export async function getMoviesAction(genres, yearRange) {
+  // Eventually, this will fetch from TMDB API
+  // For now, let's return a Mock Array to test the UI
+  return [
+    {
+      id: "1",
+      title: "Inception",
+      image: "https://image.tmdb.org/t/p/w500/9gk7Fn9sVAsS9696G1oV0Q1Xvub.jpg",
+      year: 2010,
+    },
+    {
+      id: "2",
+      title: "The Matrix",
+      image: "https://image.tmdb.org/t/p/w500/f89U3Y9L7dbptqyQej86Z7SqiU9.jpg",
+      year: 1999,
+    },
+    {
+      id: "3",
+      title: "Interstellar",
+      image: "https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlSaba7.jpg",
+      year: 2014,
+    },
+  ];
+}
+
+export async function recordSwipeAction(roomCode, userId, movieId, direction) {
+  try {
+    const client = await clientPromise;
+    const db = client.db("flixter-db");
+
+    // 1. Record the individual swipe for matching logic
+    // We update the specific participant's 'likes' array if they swipe right
+    const updateQuery =
+      direction === "right"
+        ? { $addToSet: { "participants.$.likes": movieId } }
+        : { $addToSet: { "participants.$.dislikes": movieId } };
+
+    const result = await db.collection("room").updateOne(
+      {
+        roomCode: roomCode.toUpperCase(),
+        "participants.id": userId,
+      },
+      updateQuery,
+    );
+
+    // 2. Optional: Trigger a "Match Check" logic here
+    // If the direction was 'right', we could check if everyone else likes it too.
+
+    return { success: true, match: false };
+  } catch (e) {
+    console.error("Database Swipe Error:", e);
+    return { success: false };
   }
 }

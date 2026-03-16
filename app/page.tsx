@@ -67,11 +67,11 @@ export default function HomePage() {
   // View 1: Identify User (First Time)
   if (!user || isEditingName) {
     return (
-      <main className="min-h-[100dvh] flex flex-col items-center justify-center p-6 bg-background">
+      <main className="min-h-dvh flex flex-col items-center justify-center p-6 bg-background">
         <div className="w-full max-w-sm space-y-8">
           <div className="text-center">
             <h1 className="text-5xl font-black tracking-tighter text-primary italic">
-              FLIXTER
+              NATHEO.SYNC
             </h1>
             <p className="text-muted-foreground uppercase tracking-widest text-[10px] font-bold mt-2">
               Personalize your profile
@@ -98,6 +98,11 @@ export default function HomePage() {
               <Input
                 placeholder="What should we call you?"
                 value={name}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleSaveName();
+                  }
+                }}
                 onChange={(e) => setName(e.target.value)}
                 className="h-12 bg-background border-2 font-medium"
                 autoFocus
@@ -121,8 +126,8 @@ export default function HomePage() {
     <main className="min-h-[100dvh] flex flex-col items-center justify-center p-6 bg-background">
       <div className="w-full max-w-sm space-y-12">
         <div className="text-center space-y-2 group">
-          <h1 className="text-5xl font-black tracking-tighter text-primary italic mb-4">
-            FLIXTER
+          <h1 className="font-sans text-3xl font-black tracking-tighter text-primary italic mb-4">
+            NATHEO.SYNC
           </h1>
           <div className="flex items-center justify-center gap-2 mt-4">
             <h1 className="text-4xl font-black tracking-tighter">
@@ -157,9 +162,9 @@ export default function HomePage() {
           {/* Join Logic here */}
           {!isJoining ? (
             <Button
-              variant="outline"
+              // variant="outline"
               onClick={() => setIsJoining(true)}
-              className="h-24 flex flex-col items-center justify-center gap-1 rounded-3xl border-2 border-border hover:border-primary transition-all bg-card"
+              className="h-24 flex flex-col items-center justify-center gap-1 rounded-3xl border-2 border-primary/20 hover:border-primary transition-all bg-card text-foreground hover:bg-primary/5"
             >
               <Users className="w-6 h-6 text-primary" />
               <span className="font-bold text-lg tracking-tight">
@@ -171,11 +176,16 @@ export default function HomePage() {
               {/* ... your previous join code ... */}
               <div className="flex gap-2">
                 <Input
-                  placeholder="CODE"
+                  placeholder="Enter Room Code"
                   value={roomCode}
                   onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      handleJoinRoom();
+                    }
+                  }}
                   maxLength={4}
-                  className="h-12 text-center text-xl font-black tracking-[0.5em] uppercase"
+                  className="h-12 text-center text-xl font-normal uppercase"
                 />
                 <Button
                   onClick={handleJoinRoom}

@@ -11,6 +11,84 @@
     perspective: 1000px;
   }
 }
+
+/* Define the background colors using OKLCH */
+.bg-action {
+  background-color: oklch(90% 0.1 280deg);
+}
+
+.bg-adventure {
+  background-color: oklch(90% 0.2 60deg);
+}
+
+.bg-animation {
+  background-color: oklch(90% 0.3 330deg);
+}
+
+.bg-comedy {
+  background-color: oklch(90% 0.4 80deg);
+}
+
+.bg-crime {
+  background-color: oklch(90% 0.5 150deg);
+}
+
+.bg-documentary {
+  background-color: oklch(90% 0.6 210deg);
+}
+
+.bg-drama {
+  background-color: oklch(90% 0.7 270deg);
+}
+
+.bg-family {
+  background-color: oklch(90% 0.8 330deg);
+}
+
+.bg-fantasy {
+  background-color: oklch(90% 0.9 390deg);
+}
+
+.bg-history {
+  background-color: oklch(90% 1 450deg);
+}
+
+.bg-horror {
+  background-color: oklch(90% 1.1 510deg);
+}
+
+.bg-music {
+  background-color: oklch(90% 1.2 570deg);
+}
+
+.bg-mystery {
+  background-color: oklch(90% 1.3 630deg);
+}
+
+.bg-romance {
+  background-color: oklch(90% 1.4 690deg);
+}
+
+.bg-science-fiction {
+  background-color: oklch(90% 1.5 750deg);
+}
+
+.bg-tv-movie {
+  background-color: oklch(90% 1.6 810deg);
+}
+
+.bg-thriller {
+  background-color: oklch(90% 1.7 870deg);
+}
+
+.bg-war {
+  background-color: oklch(90% 1.8 930deg);
+}
+
+.bg-western {
+  background-color: oklch(90% 1.9 990deg);
+}
+
 @custom-variant dark (&:is(.dark *));
 :root {
   --background: oklch(0.9532 0.0137 67.6613);
@@ -113,7 +191,7 @@
   --font-sans: Poppins, sans-serif;
   --font-serif: Lora, serif;
   --font-mono: Fira Code, monospace;
-  --radius: 0.4rem;
+  --radius: 0rem;
   --shadow-x: 3px;
   --shadow-y: 3px;
   --shadow-blur: 0px;
