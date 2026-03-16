@@ -1,3 +1,4 @@
+import { Heart, X } from "lucide-react";
 import MovieCard from "./MovieCard";
 
 // components/swipe-engine.tsx
