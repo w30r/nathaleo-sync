@@ -2,10 +2,13 @@ import { getRoomData } from "@/app/actions/roomActions";
 import { notFound } from "next/navigation";
 import SwipeContainer from "../../components/SwipeContainer";
 
-async function getMovies(genreId?: string) {
-  const API_KEY = process.env.TMBD_API_KEY;
-  const url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=${genreId || ""}&language=en-US&sort_by=popularity.desc`;
-
+async function getMovies(genreId?: string[]) {
+  const API_KEY = process.env.TMDB_API_KEY;
+  // const randomPage = Math.floor(Math.random() * 5) + 1;
+  const randomPage = 1;
+  const genreFilter =
+    genreId && genreId.length > 0 ? `&with_genres=${genreId.join("|")}` : "";
+  const url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=en-US&sort_by=popularity.desc&include_adult=false&page=${randomPage}${genreFilter}`;
   const res = await fetch(url, { next: { revalidate: 3600 } });
   const data = await res.json();
   console.log(data);
@@ -24,7 +27,7 @@ export default async function SwipePage({
   if (!room) notFound();
 
   // Use the genre the host picked during setup
-  const movies = await getMovies(room.config?.genre);
+  const movies = await getMovies(room.genres);
 
   return (
     <main className="h-dvh bg-background flex flex-col items-center overflow-hidden">
@@ -44,6 +47,7 @@ export default async function SwipePage({
         <SwipeContainer
           initialMovies={movies}
           roomCode={id}
+          genres={room.genres} // 👈 Add this prop!
           durationInMinutes={room.duration || 1}
         />
       </div>

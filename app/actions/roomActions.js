@@ -123,6 +123,7 @@ export async function createRoomAction(roomData) {
       // spread roomData (hostId, hostName, genres, duration, yearRange)
       ...roomData,
       roomCode,
+      genres: roomData.genres,
       status: "open",
       createdAt: new Date(),
       // UPDATED: Store the host as an object inside the array
@@ -238,4 +239,16 @@ export async function recordSwipeAction(roomCode, userId, movieId, direction) {
     console.error("Database Swipe Error:", e);
     return { success: false };
   }
+}
+
+export async function fetchMoreMovies(genreIds, page) {
+  const API_KEY = process.env.TMDB_API_KEY;
+  const genreFilter =
+    genreIds?.length > 0 ? `&with_genres=${genreIds.join("|")}` : "";
+
+  const url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=en-US&sort_by=popularity.desc&include_adult=false&page=${page}${genreFilter}`;
+
+  const res = await fetch(url);
+  const data = await res.json();
+  return data.results || [];
 }

@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import MovieCard from "./MovieCard";
 import { Button } from "@/components/ui/button";
 import {
+  fetchMoreMovies,
   finishSwipingAction,
   getRoomData,
   recordSwipeAction,
@@ -59,26 +60,96 @@ export default function SwipeContainer({
   initialMovies,
   roomCode,
   durationInMinutes,
+  genres,
 }: {
+  genres: any[];
   initialMovies: any[];
   roomCode: string;
   durationInMinutes: number;
 }) {
   const [movies, setMovies] = useState(initialMovies);
   const [isFinished, setIsFinished] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Initialize with the dynamic duration
   const [timeLeft, setTimeLeft] = useState(durationInMinutes * 60);
 
+  const triggerFetchMore = async () => {
+    setIsFetching(true);
+    const nextPage = currentPage + 1;
+    try {
+      const newMovies = await fetchMoreMovies(genres, nextPage);
+      setMovies((prev) => [...prev, ...newMovies]);
+      setCurrentPage(nextPage);
+    } catch (err) {
+      console.error("Failed to load more movies", err);
+    } finally {
+      setIsFetching(false);
+    }
+  };
+
   const handleSwipe = async (direction: "left" | "right") => {
     const swipedMovie = movies[0];
+    if (!swipedMovie) return;
+
     const storedUser = localStorage.getItem("flixter_user");
     if (storedUser) {
       const { id: userId } = JSON.parse(storedUser);
-      await recordSwipeAction(roomCode, userId, swipedMovie.id, direction);
+      // Don't 'await' this if you want the UI to feel snappy
+      recordSwipeAction(roomCode, userId, swipedMovie.id, direction);
     }
+
+    // ONLY remove the card here. Don't trigger the fetch here.
     setMovies((prev) => prev.slice(1));
   };
+
+  useEffect(() => {
+    const loadMore = async () => {
+      if (movies.length <= 5 && !isFetching && !isFinished) {
+        setIsFetching(true);
+        try {
+          const nextPage = currentPage + 1;
+          const newMovies = await fetchMoreMovies(genres, nextPage);
+
+          if (newMovies.length > 0) {
+            setMovies((prev) => [...prev, ...newMovies]);
+            setCurrentPage(nextPage);
+          }
+        } catch (err) {
+          console.error("Failed to fetch more movies:", err);
+        } finally {
+          setIsFetching(false);
+        }
+      }
+    };
+
+    loadMore();
+  }, [movies.length, isFetching, genres, currentPage, isFinished]);
+
+  // const handleSwipe = async (direction: "left" | "right") => {
+  //   const swipedMovie = movies[0];
+  //   if (!swipedMovie) return;
+
+  //   // 1. Record Swipe (Don't wait for this to update the UI)
+  //   const storedUser = localStorage.getItem("flixter_user");
+  //   if (storedUser) {
+  //     const { id: userId } = JSON.parse(storedUser);
+  //     recordSwipeAction(roomCode, userId, swipedMovie.id, direction);
+  //   }
+
+  //   // 2. Update state and check length simultaneously
+  //   setMovies((prev) => {
+  //     const nextList = prev.slice(1);
+
+  //     // Check if we need more movies based on the NEW list
+  //     if (nextList.length <= 5 && !isFetching) {
+  //       triggerFetchMore(); // Move fetching to a separate function
+  //     }
+
+  //     return nextList;
+  //   });
+  // };
 
   const handleFinish = async () => {
     setIsFinished(true);

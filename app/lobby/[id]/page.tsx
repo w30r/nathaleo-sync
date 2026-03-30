@@ -25,6 +25,28 @@ export default function LobbyPage() {
   const [countdown, setCountdown] = useState(10);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
+  const GENRE_MAP: Record<number, string> = {
+    28: "Action",
+    12: "Adventure",
+    16: "Animation",
+    35: "Comedy",
+    80: "Crime",
+    99: "Documentary",
+    18: "Drama",
+    10751: "Family",
+    14: "Fantasy",
+    36: "History",
+    27: "Horror",
+    10402: "Music",
+    9648: "Mystery",
+    10749: "Romance",
+    878: "Sci-Fi",
+    10770: "TV Movie",
+    53: "Thriller",
+    10752: "War",
+    37: "Western",
+  };
+
   function handleStartSession() {
     // start room action + shorten time
     startRoomAction(id);
@@ -159,17 +181,28 @@ export default function LobbyPage() {
 
         {/* Room Rules Summary */}
         <section className="grid grid-cols-2 gap-4">
+          {/* Dynamic Genres Section */}
           <div className="bg-secondary/30 p-4 rounded-2xl space-y-1">
             <div className="flex items-center gap-2 text-[10px] font-bold uppercase opacity-60">
               <Film className="w-3 h-3" /> Genres
             </div>
-            <p className="font-bold text-sm">Action, Sci-Fi</p>
+            <p className="font-bold text-sm truncate">
+              {room?.genres && room.genres.length > 0
+                ? room.genres
+                    .map((id: number) => GENRE_MAP[id] || "Movie")
+                    .join(", ")
+                : "All Genres"}
+            </p>
           </div>
+
+          {/* Dynamic Timer Section */}
           <div className="bg-secondary/30 p-4 rounded-2xl space-y-1">
             <div className="flex items-center gap-2 text-[10px] font-bold uppercase opacity-60">
               <Timer className="w-3 h-3" /> Timer
             </div>
-            <p className="font-bold text-sm">5 Minutes</p>
+            <p className="font-bold text-sm">
+              {room?.duration ? `${room.duration} Minutes` : "--"}
+            </p>
           </div>
         </section>
       </div>

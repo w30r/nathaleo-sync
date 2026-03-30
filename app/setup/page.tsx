@@ -20,6 +20,7 @@ import {
   ChevronLeft,
 } from "lucide-react";
 import { createRoomAction } from "../actions/roomActions";
+import { select } from "framer-motion/client";
 
 const GENRES = [
   { id: 28, name: "Action" },
@@ -69,6 +70,7 @@ export default function SetupPage() {
     setSelectedGenres((prev) =>
       prev.includes(id) ? prev.filter((g) => g !== id) : [...prev, id],
     );
+    console.log(selectedGenres);
   };
 
   const handleSelectAllGenres = () => {
@@ -90,8 +92,12 @@ export default function SetupPage() {
         yearRange: yearRange,
       });
 
+      console.log("DEBUG: Response from Server Action:", result);
+
       if (result.success) {
         router.push(`/lobby/${result.roomCode}`);
+        console.log("Room created:", result);
+        console.log("selectedGenres:", selectedGenres);
       } else {
         alert("Something went wrong!");
         setLoading(false);

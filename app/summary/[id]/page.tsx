@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import SummaryWrapped from "@/app/components/Wrapped";
 
 async function getMovieDetails(movieIds: string[]) {
-  const API_KEY = process.env.TMBD_API_KEY;
+  const API_KEY = process.env.TMDB_API_KEY;
   const requests = movieIds.map((id) =>
     fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}`).then(
       (res) => res.json(),
