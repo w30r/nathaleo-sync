@@ -252,3 +252,17 @@ export async function fetchMoreMovies(genreIds, page) {
   const data = await res.json();
   return data.results || [];
 }
+
+// New function to get all rooms from the database
+export async function getAllRooms() {
+  try {
+    const client = await clientPromise;
+    const db = client.db("flixter-db");
+
+    const rooms = await db.collection("room").find({}).toArray();
+    return rooms.map(room => JSON.parse(JSON.stringify(room)));
+  } catch (e) {
+    console.error("Fetch All Rooms Error:", e);
+    return [];
+  }
+}
