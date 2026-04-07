@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { PlusCircle, Users, Pencil, Check, X } from "lucide-react";
+import { PlusCircle, Users, Pencil, Check, X, Wrench } from "lucide-react";
 import { joinRoomAction } from "./actions/roomActions";
 
 export default function HomePage() {
@@ -196,6 +196,17 @@ export default function HomePage() {
               </div>
             </Card>
           )}
+        </div>
+
+        {/* Add the devtool button */}
+        <div className="absolute bottom-4 right-4">
+          <Button
+            onClick={() => router.push("/devtool")}
+            className="h-12 px-6 font-bold"
+          >
+            <Wrench className="w-4 h-4 mr-2" />
+            Devtool
+          </Button>
         </div>
       </div>
     </main>
